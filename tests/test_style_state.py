@@ -11,6 +11,7 @@ style_map = {
     'ITALIC': {'element': 'em'},
     'BOLD': {'element': 'strong'},
     'HIGHLIGHT': {'element': 'strong', 'textDecoration': 'underline'},
+    'OUTLINE': {'element': 'span', 'attributes': {'class': 'outline'}},
 }
 
 
@@ -48,6 +49,10 @@ class TestStyleState(unittest.TestCase):
     def test_get_style_value_multiple(self):
         self.style_state.apply(Command('start_inline_style', 0, 'HIGHLIGHT'))
         self.assertEqual(self.style_state.get_style_value(), 'text-decoration: underline;')
+
+    def test_get_attributes(self):
+        self.style_state.apply(Command('start_inline_style', 0, 'OUTLINE'))
+        self.assertEqual(self.style_state.get_attributes(), {'class': 'outline'})
 
     def test_add_node_unstyled(self):
         self.assertEqual(DOM.get_tag_name(self.style_state.add_node(DOM.create_element('p'), 'Test text')), 'textnode')

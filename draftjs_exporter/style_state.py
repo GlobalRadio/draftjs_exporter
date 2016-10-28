@@ -51,10 +51,18 @@ class StyleState():
         for style in self.styles:
             css_style = self.style_map.get(style, {})
             for prop in css_style.keys():
-                if prop != 'element':
+                if prop != 'element' and prop != 'attributes':
                     rules.append('{0}: {1};'.format(camelToDash(prop), css_style[prop]))
 
         return ''.join(sorted(rules))
+
+    def get_attributes(self):
+        for style in self.styles:
+            css_style = self.style_map.get(style, {})
+            for prop in css_style.keys():
+                if prop == 'attributes':
+                    return css_style[prop]
+        return {}
 
     def add_node(self, element, text):
         if self.is_unstyled():
@@ -74,6 +82,10 @@ class StyleState():
             style_value = self.get_style_value()
             if style_value:
                 DOM.set_attribute(child, 'style', style_value)
+
+            attributes = self.get_attributes()
+            for attr in attributes:
+                DOM.set_attribute(child, camelToDash(attr), attributes[attr])
 
             DOM.set_text_content(child, text)
 
