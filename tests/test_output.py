@@ -25,7 +25,8 @@ config = {
         INLINE_STYLES.ITALIC: {'element': 'em'},
         INLINE_STYLES.BOLD: {'element': 'strong'},
         'HIGHLIGHT': {'element': 'strong', 'textDecoration': 'underline'},
-        'OUTLINE': {'element': 'span', 'attributes': {'class': 'outline'}}
+        'OUTLINE': {'element': 'span', 'class': 'outline'},
+        'STRIKETHROUGH': {'element': 'span', 'class': 'strikethrough'}
     },
 }
 
@@ -155,7 +156,7 @@ class TestOutput(unittest.TestCase):
             ]
         }), '<h1><strong>He</strong>ader</h1><p><strong style="text-decoration: underline;">some</strong> <a href="http://example.com">paragraph</a> text</p>')
 
-    def test_render_with_inline_attributes(self):
+    def test_render_with_inline_class(self):
         self.assertEqual(self.exporter.render({
             'entityMap': {},
             'blocks': [
@@ -175,6 +176,33 @@ class TestOutput(unittest.TestCase):
                 }
             ]
         }), '<p>some <span class="outline">paragraph</span> text</p>')
+
+    def test_render_with_multiple_inline_classes(self):
+        self.assertEqual(self.exporter.render({
+            'entityMap': {},
+            'blocks': [
+                {
+                    'key': 'dem5p',
+                    'text': 'some paragraph text',
+                    'type': 'unstyled',
+                    'depth': 0,
+                    'inlineStyleRanges': [
+                        {
+                            'offset': 5,
+                            'length': 9,
+                            'style': 'OUTLINE'
+                        },
+                        {
+                            'offset': 5,
+                            'length': 9,
+                            'style': 'STRIKETHROUGH'
+                        },
+
+                    ],
+                    'entityRanges': []
+                }
+            ]
+        }), '<p>some <span class="outline strikethrough">paragraph</span> text</p>')
 
     def test_render_with_entities(self):
         self.assertEqual(self.exporter.render({
