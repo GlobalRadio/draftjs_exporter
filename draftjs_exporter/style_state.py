@@ -46,15 +46,18 @@ class StyleState():
         return sorted(list(set(tags)))
 
     def get_style_value(self):
-        rules = []
+        rules = {}
 
         for style in self.styles:
             css_style = self.style_map.get(style, {})
             for prop in css_style.keys():
-                if prop != 'element' and prop != 'class':
-                    rules.append('{0}: {1};'.format(camelToDash(prop), css_style[prop]))
+                if prop != 'element' and prop != 'class' and prop != 'className':
+                    rules.setdefault(camelToDash(prop), []).append(css_style[prop])
 
-        return ''.join(sorted(rules))
+        # Flatten rules that share the same CSS property e.g text-decoration: underline line-through;
+        flattened_rules = ["{0}: {1};".format(camelToDash(prop), ' '.join(values)) for prop, values in rules.items()]
+
+        return ''.join(sorted(flattened_rules))
 
     def get_class_value(self):
         class_names = []
@@ -62,8 +65,8 @@ class StyleState():
         for style in self.styles:
             css_style = self.style_map.get(style, {})
             for prop in css_style.keys():
-                if prop == 'class':
-                        class_names.append(css_style[prop])
+                if prop == 'class' or prop == 'className':
+                    class_names.append(css_style[prop])
 
         return ' '.join(class_names)
 

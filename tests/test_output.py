@@ -25,8 +25,9 @@ config = {
         INLINE_STYLES.ITALIC: {'element': 'em'},
         INLINE_STYLES.BOLD: {'element': 'strong'},
         'HIGHLIGHT': {'element': 'strong', 'textDecoration': 'underline'},
-        'OUTLINE': {'element': 'span', 'class': 'outline'},
-        'STRIKETHROUGH': {'element': 'span', 'class': 'strikethrough'}
+        'STRIKETHROUGH': {'element': 'strong', 'textDecoration': 'line-through'},
+        'OUTLINE': {'class': 'outline'},
+        'SHADOW': {'class': 'shadow'},
     },
 }
 
@@ -156,6 +157,33 @@ class TestOutput(unittest.TestCase):
             ]
         }), '<h1><strong>He</strong>ader</h1><p><strong style="text-decoration: underline;">some</strong> <a href="http://example.com">paragraph</a> text</p>')
 
+    def test_render_multiple_text_decoration_values(self):
+        self.assertEqual(self.exporter.render({
+            'entityMap': {},
+            'blocks': [
+                {
+                    'key': 'dem5p',
+                    'text': 'some paragraph text',
+                    'type': 'unstyled',
+                    'depth': 0,
+                    'inlineStyleRanges': [
+                        {
+                            'offset': 5,
+                            'length': 9,
+                            'style': 'HIGHLIGHT'
+                        },
+                        {
+                            'offset': 5,
+                            'length': 9,
+                            'style': 'STRIKETHROUGH'
+                        },
+
+                    ],
+                    'entityRanges': []
+                }
+            ]
+        }), '<p>some <strong style="text-decoration: underline line-through;">paragraph</strong> text</p>')
+
     def test_render_with_inline_class(self):
         self.assertEqual(self.exporter.render({
             'entityMap': {},
@@ -195,14 +223,14 @@ class TestOutput(unittest.TestCase):
                         {
                             'offset': 5,
                             'length': 9,
-                            'style': 'STRIKETHROUGH'
+                            'style': 'SHADOW'
                         },
 
                     ],
                     'entityRanges': []
                 }
             ]
-        }), '<p>some <span class="outline strikethrough">paragraph</span> text</p>')
+        }), '<p>some <span class="outline shadow">paragraph</span> text</p>')
 
     def test_render_with_entities(self):
         self.assertEqual(self.exporter.render({
